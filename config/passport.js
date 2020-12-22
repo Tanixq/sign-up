@@ -4,6 +4,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
+const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 
 passport.serializeUser(function (user, done) {
   done(null, user._id);
@@ -14,6 +15,47 @@ passport.deserializeUser(async (id, done) => {
     done(err, user);
   });
 });
+
+
+
+passport.use(new LinkedInStrategy({
+  clientID: process.env.LINKEDIN_CLIENT_ID,
+  clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+  callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/linkedin/callback",
+  scope: ['r_emailaddress', 'r_liteprofile'],
+}, function(accessToken, refreshToken, profile, cb) {
+  // asynchronous verification, for effect...
+  process.nextTick(function () {
+      User.findOne(
+        {
+          email: profile.emails[0].value,
+        },
+        (err, user) => {
+          if (err) {
+            return cb(err);
+          }
+          if (user) {
+            return cb(err,user);
+          }
+          const newUser = new User({
+                  fname: profile.name.givenName,
+                  lname: profile.name.familyName,
+                  email: profile._json.email,
+                  linkedin_id: profile.id
+                });
+          // saving new user in DB
+          newUser.save(function (err, result) {
+            if (err) {
+              console.log(err);
+              return cb(err);
+            } else {
+              return cb(null, newUser);
+            }
+          });
+        }
+      );
+  });
+}));
 
 passport.use(
   "local-signup",
@@ -33,9 +75,7 @@ passport.use(
             return done(err);
           }
           if (user) {
-            return done(null, false, {
-              message: "Email already Exist ! Please Login",
-            });
+            return done(null, false);
           }
 
           var newUser = new User({
@@ -65,7 +105,7 @@ passport.use(
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:5000/user/auth/google/callback"
+    callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/google/callback"
   },
 
   (accessToken, refreshToken, profile, cb) => {
@@ -104,14 +144,14 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: "http://localhost:5000/user/auth/facebook/callback",
+  callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/facebook/callback",
   profileFields: ['id' , 'email','first_name', 'last_name']
 },
 
 (accessToken, refreshToken, profile, cb) => {
   User.findOne(
     {
-      facebook: profile.id,
+      facebook_id: profile.id,
     },
     (err, user) => {
       if (err) {
@@ -143,7 +183,7 @@ passport.use(new FacebookStrategy({
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: "http://localhost:5000/user/auth/github/callback"
+  callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/github/callback"
 },
 function(accessToken, refreshToken, profile, cb) {
   User.findOne(
