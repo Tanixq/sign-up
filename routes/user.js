@@ -6,6 +6,7 @@ const passport = require("passport");
 // get route
 router.get("/sign-up", notLoggedIn, controllers.get_user_signup);
 router.get("/successful", isLoggedIn, controllers.get_user_succesfull_signup);
+router.get("/already-exist", controllers.already_exist);
 router.get("/logout", isLoggedIn, controllers.user_logout);
 router.get(
   "/auth/google",
@@ -40,6 +41,20 @@ router.get(
   notLoggedIn,
   passport.authenticate("github", { failureRedirect: "/user/sign-up" }),
   controllers.successful_redirect
+);
+
+router.get(
+  "/auth/linkedin",
+  passport.authenticate("linkedin", { state: "SOME STATE" }),
+  function (req, res) {}
+);
+
+router.get(
+  "/auth/linkedin/callback",
+  passport.authenticate("linkedin", {
+    successRedirect: "/user/successful",
+    failureRedirect: "/user/sign-up",
+  })
 );
 
 // post route

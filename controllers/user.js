@@ -7,7 +7,7 @@ exports.get_user_signup = (req, res, next) => {
 
 exports.user_signup = passport.authenticate("local-signup", {
   successRedirect: "/user/successful",
-  failureRedirect: "/login",
+  failureRedirect: "/user/already-exist",
   failureFlash: true,
 });
 
@@ -22,4 +22,8 @@ exports.user_logout = (req, res, next) => {
 
 exports.successful_redirect = (req, res, next) => {
   res.redirect("/user/successful");
+};
+
+exports.already_exist = (req, res, next) => {
+  res.render('already-exist')
 };
