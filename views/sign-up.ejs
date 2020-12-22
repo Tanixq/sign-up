@@ -1,0 +1,29 @@
+<div id="login-box">
+  <div class="left">
+    <h1>Sign up</h1>
+
+    <form action="/user/sign-up" method="post">
+      <input type="text" name="fname" placeholder="First Name" />
+      <input type="text" name="lname" placeholder="Last Name" />
+      <input type="text" name="email" placeholder="E-mail" />
+      <input type="password" name="password" placeholder="Password" />
+      <input type="number" name="phone_number" placeholder="Phone Number" />
+      <input type="submit" name="signup_submit" value="Sign me up" />
+    </form>
+  </div>
+
+  <div class="right">
+    <span class="loginwith">Sign in with<br />social network</span>
+    <a href="/user/auth/google"
+      ><button class="social-signin google">Log in with Google</button></a
+    >
+    <a href="/user/auth/facebook"
+      ><button class="social-signin facebook">Log in with Facebook</button></a
+    >
+    <button class="social-signin twitter">Log in with Twitter</button>
+    <a href="/user/auth/github"
+      ><button class="social-signin github">Log in with Github</button></a
+    >
+  </div>
+  <div class="or">OR</div>
+</div>
