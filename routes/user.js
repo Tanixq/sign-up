@@ -45,12 +45,14 @@ router.get(
 
 router.get(
   "/auth/linkedin",
-  passport.authenticate("linkedin", { state: "SOME STATE" }),
+  notLoggedIn,
+  passport.authenticate("linkedin"),
   function (req, res) {}
 );
 
 router.get(
   "/auth/linkedin/callback",
+  notLoggedIn,
   passport.authenticate("linkedin", {
     successRedirect: "/user/successful",
     failureRedirect: "/user/sign-up",
