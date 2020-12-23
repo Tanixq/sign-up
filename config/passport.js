@@ -16,7 +16,43 @@ passport.deserializeUser(async (id, done) => {
   });
 });
 
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/google/callback"
+},
 
+(accessToken, refreshToken, profile, cb) => {
+ 
+  User.findOne(
+    {$or:[ {email: profile.emails[0].value}, {google_id:profile.id}]},
+    (err, user) => {
+      if (err) {
+        return cb(err);
+      }
+      if (user) {
+        return cb(err,user);
+      }
+
+      const newUser = new User({
+              fname: profile.name.givenName,
+              lname: profile.name.familyName,
+              email: profile.emails[0].value,
+              google_id: profile.id
+            });
+      // saving new user in DB
+      newUser.save(function (err, result) {
+        if (err) {
+          console.log(err);
+          return cb(err);
+        } else {
+          return cb(null, newUser);
+        }
+      });
+    }
+  );
+}
+));
 
 passport.use(new LinkedInStrategy({
   clientID: process.env.LINKEDIN_CLIENT_ID,
@@ -25,8 +61,6 @@ passport.use(new LinkedInStrategy({
   scope: ['r_emailaddress', 'r_liteprofile'],
 }, function(accessToken, refreshToken, profile, cb) {
   // asynchronous verification, for effect...
-  process.nextTick(function () {
-    console.log(profile);
       User.findOne({$or:[ {email: profile.emails[0].value}, {linkedin_id:profile.id}]},
         // {
         //   ,
@@ -41,7 +75,7 @@ passport.use(new LinkedInStrategy({
           const newUser = new User({
                   fname: profile.name.givenName,
                   lname: profile.name.familyName,
-                  email: profile._json.email,
+                  email: profile.emails[0].value,
                   linkedin_id: profile.id
                 });
           // saving new user in DB
@@ -55,7 +89,7 @@ passport.use(new LinkedInStrategy({
           });
         }
       );
-  });
+  
 }));
 
 passport.use(
@@ -103,43 +137,6 @@ passport.use(
   )
 );
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/google/callback"
-  },
-
-  (accessToken, refreshToken, profile, cb) => {
-    User.findOne(
-      {$or:[ {email: profile.emails[0].value}, {google_id:profile.id}]},
-      (err, user) => {
-        if (err) {
-          return cb(err);
-        }
-        if (user) {
-          return cb(err,user);
-        }
-
-        const newUser = new User({
-                fname: profile.name.givenName,
-                lname: profile.name.familyName,
-                email: profile._json.email,
-                google_id: profile.id
-              });
-        // saving new user in DB
-        newUser.save(function (err, result) {
-          if (err) {
-            console.log(err);
-            return cb(err);
-          } else {
-            return cb(null, newUser);
-          }
-        });
-      }
-    );
-  }
-));
-
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET,
@@ -148,8 +145,9 @@ passport.use(new FacebookStrategy({
 },
 
 (accessToken, refreshToken, profile, cb) => {
+  
   User.findOne(
-    {$or:[ {email: profile.emails[0].value}, {facebook_id:profile.id}]},
+    {$or:[ {email: profile.email}, {facebook_id:profile.id}]},
     (err, user) => {
       if (err) {
         return cb(err);
@@ -161,7 +159,8 @@ passport.use(new FacebookStrategy({
       const newUser = new User({
               fname: profile.name.givenName,
               lname: profile.name.familyName,
-              facebook_id: profile.id
+              facebook_id: profile.id,
+              email: profile.email
             });
       // saving new user in DB
       newUser.save(function (err, result) {
@@ -183,6 +182,7 @@ passport.use(new GitHubStrategy({
   callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/github/callback"
 },
 function(accessToken, refreshToken, profile, cb) {
+  
   User.findOne(
     {$or:[ {email: profile.emails[0].value}, {github_id:profile.id}]},
     (err, user) => {
@@ -196,7 +196,7 @@ function(accessToken, refreshToken, profile, cb) {
       const newUser = new User({
               fname: name[0],
               lname: name[1],
-              email: profile._json.email,
+              email: profile.emails[0].value,
               github_id: profile.id
             });
       // saving new user in DB

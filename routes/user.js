@@ -45,7 +45,7 @@ router.get(
 
 router.get(
   "/auth/linkedin",
-  passport.authenticate("linkedin", { state: "SOME STATE" }),
+  passport.authenticate("linkedin"),
   function (req, res) {}
 );
 
