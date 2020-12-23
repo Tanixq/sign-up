@@ -184,7 +184,7 @@ passport.use(new GitHubStrategy({
 function(accessToken, refreshToken, profile, cb) {
   
   var email;
-  if (profile.emails[0].value === false || profile.emails[0].value === undefined || profile.emails[0].value === " " ) {
+  if (profile.emails ===  undefined || profile.emails[0].value === undefined || profile.emails[0].value === " " ) {
      email=null
   }else{
     email = profile.emails[0].value;
