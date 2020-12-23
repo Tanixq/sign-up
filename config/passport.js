@@ -183,8 +183,15 @@ passport.use(new GitHubStrategy({
 },
 function(accessToken, refreshToken, profile, cb) {
   
+  var email;
+  if (profile.emails[0].value === false || profile.emails[0].value === undefined || profile.emails[0].value === " " ) {
+     email=null
+  }else{
+    email = profile.emails[0].value;
+  }
+  
   User.findOne(
-    {$or:[ {email: profile.emails[0].value}, {github_id:profile.id}]},
+    {$or:[ {email: email}, {github_id:profile.id}]},
     (err, user) => {
       if (err) {
         return cb(err);
@@ -196,7 +203,7 @@ function(accessToken, refreshToken, profile, cb) {
       const newUser = new User({
               fname: name[0],
               lname: name[1],
-              email: profile.emails[0].value,
+              email: email,
               github_id: profile.id
             });
       // saving new user in DB
