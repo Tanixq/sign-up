@@ -179,7 +179,8 @@ passport.use(new FacebookStrategy({
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/github/callback"
+  callbackURL: "https://blooming-eyrie-28901.herokuapp.com/user/auth/github/callback",
+  scope: [ 'user:email' ]
 },
 function(accessToken, refreshToken, profile, cb) {
   
