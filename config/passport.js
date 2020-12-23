@@ -26,10 +26,11 @@ passport.use(new LinkedInStrategy({
 }, function(accessToken, refreshToken, profile, cb) {
   // asynchronous verification, for effect...
   process.nextTick(function () {
-      User.findOne(
-        {
-          email: profile.emails[0].value,
-        },
+    console.log(profile);
+      User.findOne({$or:[ {email: profile.emails[0].value}, {linkedin_id:profile.id}]},
+        // {
+        //   ,
+        // },
         (err, user) => {
           if (err) {
             return cb(err);
@@ -110,9 +111,7 @@ passport.use(new GoogleStrategy({
 
   (accessToken, refreshToken, profile, cb) => {
     User.findOne(
-      {
-        email: profile._json.email,
-      },
+      {$or:[ {email: profile.emails[0].value}, {google_id:profile.id}]},
       (err, user) => {
         if (err) {
           return cb(err);
@@ -150,9 +149,7 @@ passport.use(new FacebookStrategy({
 
 (accessToken, refreshToken, profile, cb) => {
   User.findOne(
-    {
-      facebook_id: profile.id,
-    },
+    {$or:[ {email: profile.emails[0].value}, {facebook_id:profile.id}]},
     (err, user) => {
       if (err) {
         return cb(err);
@@ -187,9 +184,7 @@ passport.use(new GitHubStrategy({
 },
 function(accessToken, refreshToken, profile, cb) {
   User.findOne(
-    {
-      email: profile._json.email,
-    },
+    {$or:[ {email: profile.emails[0].value}, {github_id:profile.id}]},
     (err, user) => {
       if (err) {
         return cb(err);

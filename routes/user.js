@@ -6,7 +6,7 @@ const passport = require("passport");
 // get route
 router.get("/sign-up", notLoggedIn, controllers.get_user_signup);
 router.get("/successful", isLoggedIn, controllers.get_user_succesfull_signup);
-router.get("/already-exist", controllers.already_exist);
+router.get("/already-exist",isLoggedIn, controllers.already_exist);
 router.get("/logout", isLoggedIn, controllers.user_logout);
 router.get(
   "/auth/google",
