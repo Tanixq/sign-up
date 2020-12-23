@@ -151,7 +151,7 @@ passport.use(new FacebookStrategy({
 (accessToken, refreshToken, profile, cb) => {
   User.findOne(
     {
-      facebook: profile.id,
+      facebook_id: profile.id,
     },
     (err, user) => {
       if (err) {
